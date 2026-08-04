@@ -1,0 +1,137 @@
+name: tassproject
+
+# One-command startup:
+#   docker compose up --build
+#
+# Starts the whole LeadCRM AI stack: MySQL, Redis, Laravel API (which
+# builds the Angular frontend and serves both on :8000), Python scraper,
+# and the Node job-service (API + BullMQ workers).
+#
+# Credentials can be overridden with a .env file next to this one
+# (e.g. INTERNAL_SECRET=..., HUNTER_API_KEY=..., SENDGRID_API_KEY=...).
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: tassproject-mysql
+    restart: unless-stopped
+    ports:
+      - "3307:3306"
+    environment:
+      MYSQL_DATABASE: tassproject
+      MYSQL_USER: tassuser
+      MYSQL_PASSWORD: tasspass123
+      MYSQL_ROOT_PASSWORD: rootpass123
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-prootpass123"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    container_name: tassproject-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tassproject-backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      APP_ENV: production
+      APP_DEBUG: "false"
+      APP_URL: http://localhost:8000
+      FRONTEND_URL: http://localhost:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: tassproject
+      DB_USERNAME: tassuser
+      DB_PASSWORD: tasspass123
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SECRET:-change-me-in-your-compose-env}
+      PORT: "8000"
+
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    container_name: tassproject-scraper
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: tassproject
+      DB_USERNAME: tassuser
+      DB_PASSWORD: tasspass123
+      MOCK_MODE: "true"
+      HUNTER_API_KEY: ${HUNTER_API_KEY:-}
+      MAX_REQUESTS_PER_MINUTE: "10"
+
+  job-service:
+    build:
+      context: ./job-service
+      dockerfile: Dockerfile
+    container_name: tassproject-job-service
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      PORT: "4000"
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      INTERNAL_SECRET: ${INTERNAL_SECRET:-change-me-in-your-compose-env}
+      LARAVEL_API_URL: http://backend:8000/api
+      SENDGRID_API_KEY: ${SENDGRID_API_KEY:-}
+      SENDGRID_FROM_EMAIL: ${SENDGRID_FROM_EMAIL:-outreach@tassproject.test}
+      SENDGRID_FROM_NAME: ${SENDGRID_FROM_NAME:-TassProject Outreach}
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID:-}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN:-}
+      TWILIO_FROM_NUMBER: ${TWILIO_FROM_NUMBER:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+
+  job-workers:
+    build:
+      context: ./job-service
+      dockerfile: Dockerfile
+    container_name: tassproject-job-workers
+    restart: unless-stopped
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: ["node", "src/workers/runAll.js"]
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: "6379"
+      INTERNAL_SECRET: ${INTERNAL_SECRET:-change-me-in-your-compose-env}
+      LARAVEL_API_URL: http://backend:8000/api
+
+volumes:
+  mysql_data:

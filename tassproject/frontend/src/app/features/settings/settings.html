@@ -1,0 +1,110 @@
+<div class="page-header">
+  <div>
+    <h1>Settings</h1>
+    <p class="page-subtitle">Integrations, automation rules and user management</p>
+  </div>
+  <button class="refresh-btn" (click)="load()" [disabled]="loading()">Refresh</button>
+</div>
+
+@if (loading()) {
+  <div class="settings-loading">
+    <div class="spinner"></div>
+    <span>Loading settings&hellip;</span>
+  </div>
+} @else if (error()) {
+  <div class="settings-error">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="14" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <line x1="16" y1="9" x2="16" y2="18" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="16" cy="22" r="1.5" fill="#dc2626"/>
+    </svg>
+    <span>{{ error() }}</span>
+    <button class="retry-btn" (click)="load()">Try again</button>
+  </div>
+} @else if (data(); as d) {
+
+  <!-- Integrations -->
+  <div class="card">
+    <div class="card-head"><h2>Integrations</h2></div>
+    <div class="integration-grid">
+      @for (int of integrationEntries(); track int.key) {
+        <div class="integration-card">
+          <div class="integration-icon" [class.on]="int.configured">
+            @if (int.configured) {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            } @else {
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            }
+          </div>
+          <div class="integration-body">
+            <div class="integration-label">{{ int.label }}</div>
+            <div class="integration-detail" [class.on]="int.configured">{{ int.detail }}</div>
+          </div>
+          <span class="badge" [class.badge-on]="int.configured" [class.badge-off]="!int.configured">
+            {{ int.configured ? 'Live' : 'Mock' }}
+          </span>
+        </div>
+      }
+    </div>
+    <p class="hint">API keys live in each service's <code>.env</code> file (backend, job-service, scraper). Adding a key here switches that integration from mock to live.</p>
+  </div>
+
+  <!-- Automation config -->
+  <div class="card">
+    <div class="card-head"><h2>Automation rules</h2></div>
+    <form (ngSubmit)="save()" class="settings-form">
+      <label class="field">
+        <span>Auto-approve threshold (match score)</span>
+        <input type="number" min="0" max="100" [(ngModel)]="form.auto_approve_threshold" name="threshold">
+        <small>Leads at or above this score are auto-approved into the pipeline.</small>
+      </label>
+      <label class="field toggle">
+        <span>Auto-approve enabled</span>
+        <input type="checkbox" [(ngModel)]="form.auto_approve_enabled" name="autoapprove">
+        <small>Allow leads to enter outreach without manual review.</small>
+      </label>
+      <label class="field">
+        <span>Scraping rate limit (requests / minute)</span>
+        <input type="number" min="1" max="60" [(ngModel)]="form.max_requests_per_minute" name="ratelimit">
+        <small>Keeps the scraper under Google's anti-bot thresholds.</small>
+      </label>
+      <div class="form-actions">
+        <button type="submit" class="save-btn" [disabled]="saving()">
+          {{ saving() ? 'Saving&hellip;' : 'Save changes' }}
+        </button>
+        @if (saved()) {
+          <span class="saved-msg">Saved</span>
+        }
+      </div>
+    </form>
+  </div>
+
+  <!-- User management -->
+  <div class="card">
+    <div class="card-head"><h2>Users &amp; roles</h2></div>
+    <div class="table-wrap">
+      <table class="user-table">
+        <thead>
+          <tr><th>Name</th><th>Email</th><th>Role</th><th>Last login</th></tr>
+        </thead>
+        <tbody>
+          @for (user of d.users; track user.id) {
+            <tr>
+              <td>{{ user.name }}</td>
+              <td>{{ user.email }}</td>
+              <td>
+                <select class="role-select" [value]="user.role" (change)="updateRole({ id: user.id, role: $any($event.target).value })">
+                  <option value="admin">Admin</option>
+                  <option value="rep">Sales Rep</option>
+                  <option value="readonly">Read-only</option>
+                </select>
+              </td>
+              <td>{{ user.last_login ? (user.last_login | date: 'short') : '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+}

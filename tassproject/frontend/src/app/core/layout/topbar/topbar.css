@@ -1,0 +1,77 @@
+.topbar {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1.75rem;
+  background: #fff;
+  border-bottom: 1px solid #e5efec;
+  font-family: var(--tplus-font-body, 'Inter', -apple-system, sans-serif);
+}
+
+.topbar-left {
+  display: flex;
+  align-items: center;
+}
+
+.user-area {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--tplus-gradient);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--tplus-ink-900, #0b1f1c);
+}
+
+.role-badge {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--tplus-ink-300, #a9beb8);
+  font-weight: 500;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.45rem 0.9rem;
+  border: 1.5px solid #e5efec;
+  background: #fff;
+  color: var(--tplus-ink-500, #5f7671);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  margin-left: 0.5rem;
+}
+
+.logout-btn:hover {
+  border-color: var(--tplus-teal-500, #12a496);
+  color: var(--tplus-teal-700, #077a6c);
+  background: var(--tplus-teal-50, #eef6f4);
+}

@@ -1,0 +1,153 @@
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: #0d8a7c;
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+
+.profile-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 900px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 1.25rem;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.card-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+dl {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  row-gap: 0.4rem;
+  column-gap: 0.5rem;
+  font-size: 0.85rem;
+  margin: 0 0 1rem;
+}
+
+dt {
+  color: #64748b;
+}
+
+dd {
+  margin: 0;
+  color: #0f172a;
+  word-break: break-word;
+}
+
+.stage-label,
+.notes-label {
+  display: block;
+  font-size: 0.8rem;
+  color: #334155;
+  margin-bottom: 0.75rem;
+}
+
+select,
+textarea {
+  display: block;
+  width: 100%;
+  margin-top: 0.35rem;
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.btn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background: #0d8a7c;
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.btn.danger {
+  background: #fff;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+h2 {
+  font-size: 1rem;
+  margin-top: 0;
+}
+
+.empty {
+  color: #94a3b8;
+  font-size: 0.85rem;
+}
+
+.timeline {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.timeline li {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  margin-top: 0.35rem;
+  flex-shrink: 0;
+  background: #94a3b8;
+}
+
+.dot.message {
+  background: #12a496;
+}
+
+.dot.reply {
+  background: #16a34a;
+}
+
+.dot.task {
+  background: #d97706;
+}
+
+.entry-label {
+  font-size: 0.85rem;
+  color: #0f172a;
+}
+
+.entry-time {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}

@@ -1,0 +1,32 @@
+# OS / editor
+Thumbs.db
+.DS_Store
+.idea/
+.vscode/
+
+# PHP / Laravel
+/vendor/
+backend/vendor/
+*.log
+
+# Node
+node_modules/
+frontend/node_modules/
+job-service/node_modules/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Env files - never commit secrets (examples are fine)
+.env
+.env.local
+!.env.example
+backend/.env
+scraper/.env
+job-service/.env
+
+# Build output
+frontend/dist/

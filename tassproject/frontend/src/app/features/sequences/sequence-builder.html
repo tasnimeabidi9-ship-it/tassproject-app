@@ -1,0 +1,80 @@
+<div class="page-header">
+  <h1>Sequences</h1>
+  <button class="btn" (click)="openNewForm()">+ New sequence</button>
+</div>
+
+@if (showForm()) {
+  <div class="card form-card">
+    <h2>New sequence</h2>
+    <label class="name-label">
+      Sequence name
+      <input type="text" [(ngModel)]="name" placeholder="e.g. Standard outreach" />
+    </label>
+
+    <div class="steps">
+      @for (step of steps; track $index) {
+        <div class="step">
+          <div class="step-number">{{ $index + 1 }}</div>
+          <div class="step-fields">
+            <div class="step-row">
+              <label>
+                Channel
+                <select [(ngModel)]="step.channel">
+                  <option value="email">Email</option>
+                  <option value="sms">SMS</option>
+                </select>
+              </label>
+              <label>
+                Delay (days after start)
+                <input type="number" min="0" [(ngModel)]="step.delay_days" />
+              </label>
+              <button class="btn small danger" (click)="removeStep($index)">Remove</button>
+            </div>
+            @if (step.channel === 'email') {
+              <label>
+                Subject
+                <input type="text" [(ngModel)]="step.subject" placeholder="e.g. Quick question, {{'{{'}}name{{'}}'}}" />
+              </label>
+            }
+            <label>
+              Body (use {{'{{'}}name{{'}}'}}, {{'{{'}}company{{'}}'}} as placeholders)
+              <textarea rows="3" [(ngModel)]="step.body" placeholder="Hi {{'{{'}}name{{'}}'}}, ..."></textarea>
+            </label>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="form-actions">
+      <button class="btn secondary" (click)="addStep()">+ Add step</button>
+      <button class="btn" [disabled]="saving() || !name.trim()" (click)="save()">
+        {{ saving() ? 'Saving…' : 'Save sequence' }}
+      </button>
+    </div>
+  </div>
+}
+
+<div class="card">
+  <h2>Saved sequences</h2>
+  @if (loading()) {
+    <p class="empty">Loading…</p>
+  } @else if (sequences().length === 0) {
+    <p class="empty">No sequences yet. Create one above.</p>
+  } @else {
+    @for (seq of sequences(); track seq.id) {
+      <div class="sequence-row">
+        <div>
+          <div class="sequence-name">{{ seq.name }}</div>
+          <div class="sequence-steps">
+            @for (step of seq.steps; track $index) {
+              <span class="step-chip">
+                Day {{ step.delay_days }} · {{ step.channel === 'email' ? 'Email' : 'SMS' }}
+              </span>
+            }
+          </div>
+        </div>
+        <button class="btn small danger" (click)="delete(seq.id)">Delete</button>
+      </div>
+    }
+  }
+</div>

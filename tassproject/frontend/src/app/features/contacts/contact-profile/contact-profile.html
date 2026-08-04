@@ -1,0 +1,63 @@
+@if (loading()) {
+  <p>Loading…</p>
+} @else if (contact(); as c) {
+  <a routerLink="/contacts" class="back-link">&larr; Back to contacts</a>
+
+  <div class="profile-grid">
+    <div class="card">
+      <div class="card-header">
+        <h1>{{ c.name || 'Unnamed contact' }}</h1>
+        <button class="btn danger" (click)="deleteContact()">Delete</button>
+      </div>
+
+      <dl>
+        <dt>Company</dt><dd>{{ c.company || '—' }}</dd>
+        <dt>Email</dt><dd>{{ c.email || '—' }}</dd>
+        <dt>Phone</dt><dd>{{ c.phone || '—' }}</dd>
+        <dt>Website</dt><dd>{{ c.website || '—' }}</dd>
+        <dt>Domain</dt><dd>{{ c.domain || '—' }}</dd>
+        <dt>Source</dt><dd>{{ c.source_url || '—' }}</dd>
+        <dt>Match score</dt><dd>{{ c.match_score }} / 100</dd>
+        <dt>Status</dt><dd>{{ c.status }}</dd>
+      </dl>
+
+      <label class="stage-label">
+        Pipeline stage
+        <select [ngModel]="c.stage" (ngModelChange)="changeStage($event)">
+          @for (s of stages; track s.value) {
+            <option [value]="s.value">{{ s.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label class="notes-label">
+        Notes
+        <textarea rows="4" [(ngModel)]="notesDraft"></textarea>
+      </label>
+      <button class="btn" [disabled]="saving()" (click)="saveNotes()">
+        {{ saving() ? 'Saving…' : 'Save notes' }}
+      </button>
+    </div>
+
+    <div class="card">
+      <h2>Activity timeline</h2>
+      @if (timeline().length === 0) {
+        <p class="empty">No activity yet. Messages, replies, and tasks will appear here once outreach starts.</p>
+      } @else {
+        <ul class="timeline">
+          @for (entry of timeline(); track entry) {
+            <li>
+              <span class="dot" [class]="entry.type"></span>
+              <div>
+                <div class="entry-label">{{ timelineLabel(entry) }}</div>
+                <div class="entry-time">{{ entry.timestamp | date: 'medium' }}</div>
+              </div>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+  </div>
+} @else {
+  <p>Contact not found.</p>
+}

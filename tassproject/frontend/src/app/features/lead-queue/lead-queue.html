@@ -1,0 +1,86 @@
+<div class="page-header">
+  <h1>Lead Approval Queue</h1>
+</div>
+
+<div class="filters">
+  <select [(ngModel)]="approvalStatus" (change)="applyFilters()">
+    <option value="pending_review">Pending review</option>
+    <option value="approved">Approved</option>
+    <option value="rejected">Rejected</option>
+    <option value="all">All</option>
+  </select>
+
+  <input
+    type="text"
+    placeholder="Search name, domain, email…"
+    [(ngModel)]="search"
+    (keyup.enter)="applyFilters()"
+  />
+
+  <input type="number" placeholder="Min score" min="0" max="100" [(ngModel)]="minScore" (keyup.enter)="applyFilters()" />
+
+  <button class="btn secondary" (click)="applyFilters()">Apply</button>
+
+  <div class="bulk-approve">
+    <input type="number" min="0" max="100" [(ngModel)]="bulkThreshold" />
+    <button class="btn" [disabled]="bulkRunning()" (click)="bulkApprove()">
+      {{ bulkRunning() ? 'Approving…' : 'Bulk approve ≥ score' }}
+    </button>
+  </div>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Domain</th>
+        <th>Email</th>
+        <th>Confidence</th>
+        <th>Match score</th>
+        <th>Source</th>
+        <th>Found</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr><td colspan="8" class="empty">Loading…</td></tr>
+      } @else if (leads().length === 0) {
+        <tr><td colspan="8" class="empty">No leads in this view.</td></tr>
+      } @else {
+        @for (lead of leads(); track lead.id) {
+          <tr>
+            <td>{{ lead.raw_name || '—' }}</td>
+            <td>{{ lead.domain || '—' }}</td>
+            <td>{{ lead.email || '—' }}</td>
+            <td>{{ lead.confidence_score ?? '—' }}</td>
+            <td>{{ lead.match_score ?? '—' }}</td>
+            <td class="source">
+              @if (lead.source_url) {
+                <a [href]="lead.source_url" target="_blank" rel="noopener">link</a>
+              } @else { — }
+            </td>
+            <td>{{ lead.found_at | date: 'short' }}</td>
+            <td class="actions">
+              @if (lead.approval_status === 'pending_review') {
+                <button class="btn small" [disabled]="actingOn() === lead.id" (click)="approve(lead)">Approve</button>
+                <button class="btn small danger" [disabled]="actingOn() === lead.id" (click)="reject(lead)">Reject</button>
+              } @else {
+                <span class="badge" [class.approved]="lead.approval_status === 'approved'">
+                  {{ lead.approval_status }}
+                </span>
+              }
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <button class="btn secondary" [disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">Previous</button>
+  <span>Page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</span>
+  <button class="btn secondary" [disabled]="currentPage() >= lastPage()" (click)="goToPage(currentPage() + 1)">Next</button>
+</div>

@@ -1,0 +1,45 @@
+/* ============================================================
+   TPLUS INNOVATION — brand tokens
+   Colors sampled directly from the real logo file (not guessed):
+   deep teal #025f57, mid teal #018075, bright teal #01a799
+   ============================================================ */
+
+:root {
+  /* Core teal scale — the brand's actual palette */
+  --tplus-teal-900: #04302b;
+  --tplus-teal-800: #065f56;
+  --tplus-teal-700: #077a6c;
+  --tplus-teal-600: #0d8a7c;
+  --tplus-teal-500: #12a496;
+  --tplus-teal-400: #3dbfae;
+  --tplus-teal-100: #d9f2ee;
+  --tplus-teal-50: #eef6f4;
+
+  /* Neutral ink, teal-tinted rather than pure black/gray */
+  --tplus-ink-900: #0b1f1c;
+  --tplus-ink-700: #33453f;
+  --tplus-ink-500: #5f7671;
+  --tplus-ink-300: #a9beb8;
+
+  /* Semantic (unchanged — these stay red/amber/green regardless of brand) */
+  --tplus-danger: #dc2626;
+  --tplus-danger-bg: #fee2e2;
+  --tplus-warning: #92400e;
+  --tplus-warning-bg: #fef3c7;
+  --tplus-success: #166534;
+  --tplus-success-bg: #dcfce7;
+
+  /* Gradient used for the signature block-mosaic motif */
+  --tplus-gradient: linear-gradient(135deg, var(--tplus-teal-800) 0%, var(--tplus-teal-500) 100%);
+
+  --tplus-font-display: 'Space Grotesk', 'Inter', sans-serif;
+  --tplus-font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

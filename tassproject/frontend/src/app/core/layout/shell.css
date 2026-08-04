@@ -1,0 +1,24 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+  background: var(--tplus-teal-50, #eef6f4);
+  font-family: var(--tplus-font-body, 'Inter', -apple-system, sans-serif);
+}
+
+.shell-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.shell-content {
+  padding: 1.5rem;
+  flex: 1;
+  animation: contentFadeIn 0.25s ease;
+}
+
+@keyframes contentFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

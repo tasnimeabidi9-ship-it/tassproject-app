@@ -1,0 +1,70 @@
+<div class="page-header">
+  <h1>AI Actions Log</h1>
+</div>
+
+<div class="filters">
+  <select [(ngModel)]="status" (change)="applyFilters()">
+    <option value="">All statuses</option>
+    <option value="scheduled">Scheduled</option>
+    <option value="sent">Sent</option>
+    <option value="failed">Failed</option>
+    <option value="cancelled">Cancelled</option>
+  </select>
+
+  <select [(ngModel)]="channel" (change)="applyFilters()">
+    <option value="">All channels</option>
+    <option value="email">Email</option>
+    <option value="sms">SMS</option>
+  </select>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Contact</th>
+        <th>Action</th>
+        <th>Channel</th>
+        <th>Campaign</th>
+        <th>Preview</th>
+        <th>Status</th>
+        <th>Scheduled / Executed</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr><td colspan="8" class="empty">Loading…</td></tr>
+      } @else if (entries().length === 0) {
+        <tr><td colspan="8" class="empty">No actions logged yet.</td></tr>
+      } @else {
+        @for (e of entries(); track e.id) {
+          <tr>
+            <td>{{ e.contact?.name || e.contact?.email || '—' }}</td>
+            <td>{{ e.action_type }}</td>
+            <td>{{ e.channel || '—' }}</td>
+            <td>{{ e.message?.campaign?.name || '—' }}</td>
+            <td class="preview">{{ e.content_preview || '—' }}</td>
+            <td><span [class]="statusClass(e.status)">{{ e.status }}</span></td>
+            <td>
+              {{ (e.executed_at || e.scheduled_at) | date: 'short' }}
+            </td>
+            <td>
+              @if (e.status === 'scheduled') {
+                <button class="btn small danger" [disabled]="cancelling() === e.id" (click)="cancel(e)">
+                  {{ cancelling() === e.id ? 'Cancelling…' : 'Cancel' }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <button class="btn secondary" [disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">Previous</button>
+  <span>Page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</span>
+  <button class="btn secondary" [disabled]="currentPage() >= lastPage()" (click)="goToPage(currentPage() + 1)">Next</button>
+</div>

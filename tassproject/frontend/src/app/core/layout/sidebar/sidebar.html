@@ -1,0 +1,18 @@
+<aside class="sidebar">
+  <div class="brand">
+    <img src="/logo/tplus-logo.jpg" alt="TPLUS INNOVATION" class="brand-logo" />
+    <div class="brand-text">
+      <span class="brand-name">TPLUS</span>
+      <span class="brand-sub">Sales CRM</span>
+    </div>
+  </div>
+  <nav>
+    @for (item of visibleItems(); track item.path; let i = $index) {
+      <a
+        [routerLink]="item.path"
+        routerLinkActive="active"
+        [style.animation-delay.ms]="i * 35"
+      >{{ item.label }}</a>
+    }
+  </nav>
+</aside>

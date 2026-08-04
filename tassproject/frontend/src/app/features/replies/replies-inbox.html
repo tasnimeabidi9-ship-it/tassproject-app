@@ -1,0 +1,53 @@
+<div class="page-header">
+  <h1>Replies Inbox</h1>
+  <div class="header-actions">
+    <label class="toggle">
+      <input type="checkbox" [checked]="unreadOnly" (change)="toggleUnread()" />
+      Unread only
+    </label>
+  </div>
+</div>
+
+<div class="card">
+  @if (loading()) {
+    <p class="empty">Loading…</p>
+  } @else if (replies().length === 0) {
+    <p class="empty">No replies yet.</p>
+  } @else {
+    <div class="reply-list">
+      @for (reply of replies(); track reply.id) {
+        <div class="reply-row" [class.unread]="!reply.read_by_admin">
+          <div class="reply-main">
+            <div class="reply-header">
+              <span class="contact-name">{{ reply.contact?.name || reply.contact?.email || 'Unknown contact' }}</span>
+              <span [class]="sentimentClass(reply.sentiment)">{{ reply.sentiment }}</span>
+              <span class="channel">{{ reply.message?.channel }}</span>
+              @if (!reply.read_by_admin) {
+                <span class="unread-badge">unread</span>
+              }
+            </div>
+            <p class="reply-body">{{ reply.body }}</p>
+            <div class="reply-time">{{ reply.created_at | date: 'medium' }}</div>
+
+            @if (respondingTo() === reply.id) {
+              <div class="respond-box">
+                <textarea rows="2" [(ngModel)]="respondBody" placeholder="Write a manual reply…"></textarea>
+                <button class="btn small" [disabled]="sending() || !respondBody.trim()" (click)="sendRespond(reply)">
+                  {{ sending() ? 'Sending…' : 'Send' }}
+                </button>
+              </div>
+            }
+          </div>
+          <div class="reply-actions">
+            @if (!reply.read_by_admin) {
+              <button class="btn small secondary" (click)="markRead(reply)">Mark read</button>
+            }
+            @if (respondingTo() !== reply.id) {
+              <button class="btn small secondary" (click)="openRespond(reply)">Reply</button>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>

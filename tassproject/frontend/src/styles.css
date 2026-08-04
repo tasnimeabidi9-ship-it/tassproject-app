@@ -1,0 +1,32 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import './brand-tokens.css';
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  font-family: var(--tplus-font-body, 'Inter', -apple-system, BlinkMacSystemFont, sans-serif);
+  color: var(--tplus-ink-900, #0b1f1c);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--tplus-teal-50, #eef6f4);
+}
+
+a {
+  color: inherit;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--tplus-font-display, 'Space Grotesk', 'Inter', sans-serif);
+}
+
+input, select, textarea, button {
+  font-family: inherit;
+}

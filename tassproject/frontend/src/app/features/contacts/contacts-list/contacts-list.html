@@ -1,0 +1,96 @@
+<div class="page-header">
+  <h1>Contacts</h1>
+  <div class="header-actions">
+    <a routerLink="/contacts/pipeline" class="btn secondary">Pipeline view</a>
+    <label class="btn secondary file-btn">
+      {{ importing() ? 'Importing…' : 'Import CSV' }}
+      <input type="file" accept=".csv,.txt" (change)="onFileSelected($event)" [disabled]="importing()" hidden />
+    </label>
+    <button class="btn secondary" (click)="exportCsv()">Export CSV</button>
+  </div>
+</div>
+
+@if (importResult(); as result) {
+  <div class="import-summary">
+    Imported {{ result.imported }}, skipped {{ result.skipped }}.
+    @if (result.errors.length) {
+      <details>
+        <summary>{{ result.errors.length }} row issue(s)</summary>
+        <ul>
+          @for (err of result.errors; track err) {
+            <li>{{ err }}</li>
+          }
+        </ul>
+      </details>
+    }
+  </div>
+}
+
+<div class="filters">
+  <input
+    type="text"
+    placeholder="Search name, email, company, domain…"
+    [(ngModel)]="search"
+    (keyup.enter)="applyFilters()"
+  />
+
+  <select [(ngModel)]="stage" (change)="applyFilters()">
+    <option value="">All stages</option>
+    @for (s of stages; track s.value) {
+      <option [value]="s.value">{{ s.label }}</option>
+    }
+  </select>
+
+  <select [(ngModel)]="status" (change)="applyFilters()">
+    <option value="">All statuses</option>
+    <option value="active">Active</option>
+    <option value="unsubscribed">Unsubscribed</option>
+    <option value="bounced">Bounced</option>
+  </select>
+
+  <input type="number" placeholder="Min score" min="0" max="100" [(ngModel)]="minScore" (keyup.enter)="applyFilters()" />
+
+  <button class="btn" (click)="applyFilters()">Apply</button>
+  <button class="btn secondary" (click)="clearFilters()">Clear</button>
+</div>
+
+<div class="table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Company</th>
+        <th>Email</th>
+        <th>Stage</th>
+        <th>Score</th>
+        <th>Status</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      @if (loading()) {
+        <tr><td colspan="7" class="empty">Loading…</td></tr>
+      } @else if (contacts().length === 0) {
+        <tr><td colspan="7" class="empty">No contacts found.</td></tr>
+      } @else {
+        @for (c of contacts(); track c.id) {
+          <tr [routerLink]="['/contacts', c.id]" class="row-link">
+            <td>{{ c.name || '—' }}</td>
+            <td>{{ c.company || '—' }}</td>
+            <td>{{ c.email || '—' }}</td>
+            <td><span class="badge">{{ stageLabel(c.stage) }}</span></td>
+            <td>{{ c.match_score }}</td>
+            <td>{{ c.status }}</td>
+            <td>{{ c.updated_at | date: 'short' }}</td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+</div>
+
+<div class="pagination">
+  <button class="btn secondary" [disabled]="currentPage() <= 1" (click)="goToPage(currentPage() - 1)">Previous</button>
+  <span>Page {{ currentPage() }} of {{ lastPage() }} ({{ total() }} total)</span>
+  <button class="btn secondary" [disabled]="currentPage() >= lastPage()" (click)="goToPage(currentPage() + 1)">Next</button>
+</div>

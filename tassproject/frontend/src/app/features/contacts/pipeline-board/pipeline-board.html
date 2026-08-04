@@ -1,0 +1,33 @@
+<div class="page-header">
+  <h1>Pipeline</h1>
+  <a routerLink="/contacts" class="btn secondary">Table view</a>
+</div>
+
+@if (loading()) {
+  <p>Loading…</p>
+} @else {
+  <div class="board">
+    @for (s of stages; track s.value) {
+      <div class="column" (dragover)="onDragOver($event)" (drop)="onDrop($event, s.value)">
+        <div class="column-header">
+          {{ s.label }}
+          <span class="count">{{ columns()[s.value].length }}</span>
+        </div>
+        <div class="cards">
+          @for (contact of columns()[s.value]; track contact.id) {
+            <a
+              class="card"
+              draggable="true"
+              (dragstart)="onDragStart(contact)"
+              [routerLink]="['/contacts', contact.id]"
+            >
+              <div class="card-title">{{ contact.name || contact.email || 'Unnamed' }}</div>
+              <div class="card-sub">{{ contact.company || contact.domain || '—' }}</div>
+              <div class="card-score">Score: {{ contact.match_score }}</div>
+            </a>
+          }
+        </div>
+      </div>
+    }
+  </div>
+}

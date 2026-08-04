@@ -1,0 +1,69 @@
+services:
+  - type: web
+    name: tassproject-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: "https://tassproject-api.onrender.com"
+      - key: FRONTEND_URL
+        value: "https://tassproject-api.onrender.com"
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: "FILL_AFTER_CREATE"
+      - key: DB_PORT
+        value: "5432"
+      - key: DB_DATABASE
+        value: "FILL_AFTER_CREATE"
+      - key: DB_USERNAME
+        value: "FILL_AFTER_CREATE"
+      - key: DB_PASSWORD
+        value: "FILL_AFTER_CREATE"
+      - key: REDIS_HOST
+        value: "FILL_AFTER_CREATE"
+      - key: REDIS_PORT
+        value: "6379"
+      - key: INTERNAL_SERVICE_SECRET
+        generateValue: true
+
+  - type: web
+    name: tassproject-job-service
+    runtime: node
+    plan: free
+    buildCommand: cd job-service && npm ci
+    startCommand: cd job-service && node src/server.js
+    envVars:
+      - key: PORT
+        value: "4000"
+      - key: REDIS_HOST
+        value: "FILL_AFTER_CREATE"
+      - key: REDIS_PORT
+        value: "6379"
+      - key: LARAVEL_API_URL
+        value: "https://tassproject-api.onrender.com/api"
+      - key: INTERNAL_SECRET
+        value: "FILL_AFTER_CREATE"
+
+  - type: worker
+    name: tassproject-workers
+    runtime: node
+    plan: free
+    buildCommand: cd job-service && npm ci
+    startCommand: cd job-service && node src/workers/runAll.js
+    envVars:
+      - key: REDIS_HOST
+        value: "FILL_AFTER_CREATE"
+      - key: REDIS_PORT
+        value: "6379"
+      - key: LARAVEL_API_URL
+        value: "https://tassproject-api.onrender.com/api"
+      - key: INTERNAL_SECRET
+        value: "FILL_AFTER_CREATE"

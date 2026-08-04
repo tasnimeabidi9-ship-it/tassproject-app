@@ -1,0 +1,110 @@
+<div class="dashboard">
+  <div class="page-header">
+    <h1>Dashboard</h1>
+    <span class="header-sub">Real-time overview of your sales pipeline</span>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <span>Loading dashboard&hellip;</span>
+    </div>
+  } @else if (data(); as d) {
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon leads">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        </div>
+        <div class="kpi-value">{{ d.leads_found_today }}</div>
+        <div class="kpi-label">Leads found today</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon emails">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        </div>
+        <div class="kpi-value">{{ d.emails_sent_today }}</div>
+        <div class="kpi-label">Emails sent today</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon sms">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <div class="kpi-value">{{ d.sms_sent_today }}</div>
+        <div class="kpi-label">SMS sent today</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon rate">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
+        <div class="kpi-value">{{ d.reply_rate_percent }}%</div>
+        <div class="kpi-label">Reply rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon campaigns">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+        </div>
+        <div class="kpi-value">{{ d.active_sequences }}</div>
+        <div class="kpi-label">Active campaigns</div>
+      </div>
+    </div>
+
+    @if (hasAlerts) {
+      <div class="card alert-card">
+        <div class="alert-header">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#991b1b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <h2>Alerts</h2>
+        </div>
+        <ul class="alert-list">
+          @if (d.alerts.failed_messages > 0) {
+            <li>
+              <a routerLink="/actions-log" [queryParams]="{ status: 'failed' }">
+                {{ d.alerts.failed_messages }} message(s) failed to send
+              </a>
+            </li>
+          }
+          @if (d.alerts.leads_without_email > 0) {
+            <li>{{ d.alerts.leads_without_email }} lead(s) found with no valid email</li>
+          }
+          @if (d.alerts.unread_replies > 0) {
+            <li>
+              <a routerLink="/replies">{{ d.alerts.unread_replies }} unread repl{{ d.alerts.unread_replies === 1 ? 'y' : 'ies' }}</a>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+
+    <div class="card">
+      <h2>Active campaigns</h2>
+      @if (d.active_campaigns.length === 0) {
+        <p class="empty">No campaigns currently running.</p>
+      } @else {
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Sent</th>
+              <th>Scheduled</th>
+              <th>Started</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (c of d.active_campaigns; track c.id) {
+              <tr>
+                <td class="name-cell">{{ c.name }}</td>
+                <td>{{ c.sent_count }}</td>
+                <td>{{ c.scheduled_count }}</td>
+                <td>{{ c.started_at | date: 'short' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+      <a routerLink="/campaigns" class="view-all-link">View all campaigns</a>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <p>Could not load dashboard data.</p>
+    </div>
+  }
+</div>

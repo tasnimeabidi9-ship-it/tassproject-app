@@ -1,0 +1,281 @@
+<div class="page-header">
+  <div>
+    <h1>Analytics</h1>
+    <p class="page-subtitle">Live performance across your campaigns, leads and pipeline</p>
+  </div>
+  <button class="refresh-btn" (click)="load()" [disabled]="loading()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-2.64-6.36"/><polyline points="21 3 21 9 15 9"/></svg>
+    Refresh
+  </button>
+</div>
+
+@if (loading()) {
+  <div class="analytics-loading">
+    <div class="spinner"></div>
+    <span>Loading analytics&hellip;</span>
+  </div>
+} @else if (error()) {
+  <div class="analytics-error">
+    <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+      <circle cx="16" cy="16" r="14" stroke="#dc2626" stroke-width="2" fill="none"/>
+      <line x1="16" y1="9" x2="16" y2="18" stroke="#dc2626" stroke-width="2" stroke-linecap="round"/>
+      <circle cx="16" cy="22" r="1.5" fill="#dc2626"/>
+    </svg>
+    <span>{{ error() }}</span>
+    <button class="retry-btn" (click)="load()">Try again</button>
+  </div>
+} @else if (overview(); as o) {
+
+  @if (!hasData()) {
+    <div class="analytics-empty">
+      <div class="empty-icon">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <rect x="4" y="8" width="40" height="32" rx="4" stroke="#a9beb8" stroke-width="2" fill="none"/>
+          <rect x="8" y="28" width="8" height="8" rx="1" fill="#3dbfae" opacity="0.6"/>
+          <rect x="18" y="20" width="8" height="16" rx="1" fill="#0d8a7c" opacity="0.7"/>
+          <rect x="28" y="14" width="8" height="22" rx="1" fill="#065f56" opacity="0.8"/>
+          <circle cx="38" cy="12" r="4" fill="#12a496" opacity="0.5"/>
+        </svg>
+      </div>
+      <h3>No analytics data yet</h3>
+      <p>Start a campaign, import contacts or run the lead finder and your numbers will appear here.</p>
+    </div>
+  } @else {
+
+    <!-- KPI cards -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon teal"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
+        <div class="kpi-value">{{ o.kpis.total_leads }}</div>
+        <div class="kpi-label">Total leads</div>
+        <div class="kpi-trend">{{ o.kpis.leads_found_today }} found today</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon blue"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
+        <div class="kpi-value">{{ o.kpis.emails_sent }}</div>
+        <div class="kpi-label">Emails sent</div>
+        <div class="kpi-trend">sent to date</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon amber"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg></div>
+        <div class="kpi-value">{{ o.kpis.sms_sent }}</div>
+        <div class="kpi-label">SMS sent</div>
+        <div class="kpi-trend">sent to date</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon purple"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/><path d="M8 12h8"/><path d="M8 8h5"/></svg></div>
+        <div class="kpi-value">{{ o.kpis.replies_count }}</div>
+        <div class="kpi-label">Replies received</div>
+        <div class="kpi-trend">{{ o.kpis.reply_rate_percent }}% reply rate</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg></div>
+        <div class="kpi-value">{{ o.kpis.won_deals }}</div>
+        <div class="kpi-label">Won deals</div>
+        <div class="kpi-trend">{{ o.kpis.conversion_rate_percent }}% conversion</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon red"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><rect x="7" y="12" width="3" height="6"/><rect x="12" y="8" width="3" height="10"/><rect x="17" y="5" width="3" height="13"/></svg></div>
+        <div class="kpi-value">{{ o.kpis.active_campaigns }}</div>
+        <div class="kpi-label">Active campaigns</div>
+        <div class="kpi-trend">currently running</div>
+      </div>
+    </div>
+
+    <!-- Timeline + Pipeline -->
+    <div class="charts-grid">
+      <div class="card chart-card span-2">
+        <div class="card-head">
+          <h2>Activity — last 14 days</h2>
+          <div class="legend">
+            <span class="legend-item"><i class="dot sent"></i>Sent</span>
+            <span class="legend-item"><i class="dot opened"></i>Opened</span>
+            <span class="legend-item"><i class="dot replied"></i>Replied</span>
+          </div>
+        </div>
+        @if (timeline().length > 1) {
+          <div class="line-chart">
+            <svg viewBox="0 0 720 240" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="areaSent" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#0d8a7c" stop-opacity="0.28"/>
+                  <stop offset="100%" stop-color="#0d8a7c" stop-opacity="0.02"/>
+                </linearGradient>
+                <linearGradient id="areaOpened" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#3dbfae" stop-opacity="0.18"/>
+                  <stop offset="100%" stop-color="#3dbfae" stop-opacity="0.01"/>
+                </linearGradient>
+                <linearGradient id="areaReplied" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#065f56" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#065f56" stop-opacity="0.02"/>
+                </linearGradient>
+              </defs>
+              @for (g of yGridlines(); track g.y) {
+                <line x1="24" [attr.y1]="g.y" x2="696" [attr.y2]="g.y" class="grid-line"/>
+                <text x="18" [attr.y]="g.y" class="grid-label" text-anchor="end">{{ g.label }}</text>
+              }
+              <polygon [attr.points]="timelineArea('sent')" fill="url(#areaSent)"/>
+              <polygon [attr.points]="timelineArea('opened')" fill="url(#areaOpened)"/>
+              <polygon [attr.points]="timelineArea('replied')" fill="url(#areaReplied)"/>
+              <polyline [attr.points]="timelinePoints('opened')" fill="none" class="line opened"/>
+              <polyline [attr.points]="timelinePoints('replied')" fill="none" class="line replied"/>
+              <polyline [attr.points]="timelinePoints('sent')" fill="none" class="line sent"/>
+              @for (l of xLabels(); track l.x) {
+                <text [attr.x]="l.x" y="236" class="grid-label" text-anchor="middle">{{ l.label }}</text>
+              }
+            </svg>
+          </div>
+        } @else {
+          <p class="empty">Not enough data for a timeline yet.</p>
+        }
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-head"><h2>Channel split</h2></div>
+        @if (channelDonut().length > 0) {
+          <div class="donut-wrap">
+            <svg viewBox="0 0 42 42" class="donut">
+              <circle cx="21" cy="21" r="15.9155" class="donut-track"/>
+              @for (seg of channelDonut(); track seg.label) {
+                <circle cx="21" cy="21" r="15.9155" class="donut-seg"
+                  [attr.stroke]="seg.color"
+                  [attr.stroke-dasharray]="seg.dasharray"
+                  [attr.stroke-dashoffset]="seg.dashoffset"/>
+              }
+              <text x="21" y="23" class="donut-center-value" text-anchor="middle">{{ donutTotal('channel') }}</text>
+            </svg>
+          </div>
+          <ul class="donut-legend">
+            @for (seg of channelDonut(); track seg.label) {
+              <li><i class="dot" [style.background]="seg.color"></i>{{ seg.label }}<b>{{ seg.value }}</b></li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No messages sent yet.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Donuts + Funnel -->
+    <div class="charts-grid">
+      <div class="card chart-card">
+        <div class="card-head"><h2>Message status</h2></div>
+        @if (statusDonut().length > 0) {
+          <div class="donut-wrap">
+            <svg viewBox="0 0 42 42" class="donut">
+              <circle cx="21" cy="21" r="15.9155" class="donut-track"/>
+              @for (seg of statusDonut(); track seg.label) {
+                <circle cx="21" cy="21" r="15.9155" class="donut-seg"
+                  [attr.stroke]="seg.color"
+                  [attr.stroke-dasharray]="seg.dasharray"
+                  [attr.stroke-dashoffset]="seg.dashoffset"/>
+              }
+              <text x="21" y="23" class="donut-center-value" text-anchor="middle">{{ donutTotal('status') }}</text>
+            </svg>
+          </div>
+          <ul class="donut-legend">
+            @for (seg of statusDonut(); track seg.label) {
+              <li><i class="dot" [style.background]="seg.color"></i>{{ seg.label }}<b>{{ seg.value }}</b></li>
+            }
+          </ul>
+        } @else {
+          <p class="empty">No messages yet.</p>
+        }
+      </div>
+
+      <div class="card chart-card span-2">
+        <div class="card-head"><h2>Sales pipeline — contacts by stage</h2></div>
+        @if (pipeline().some((p) => p.count > 0)) {
+          <div class="bar-list funnel">
+            @for (p of pipeline(); track p.stage) {
+              @if (p.count > 0) {
+                <div class="bar-row">
+                  <span class="bar-label">{{ stageLabel(p.stage) }}</span>
+                  <div class="bar-track"><div class="bar-fill" [style.width.%]="barWidth(p.count, pipelineMax())"></div></div>
+                  <span class="bar-value">{{ p.count }}</span>
+                </div>
+              }
+            }
+          </div>
+        } @else {
+          <p class="empty">No contacts in the pipeline yet.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Campaigns + Top companies -->
+    <div class="charts-grid">
+      <div class="card chart-card span-2">
+        <div class="card-head"><h2>Campaign performance</h2></div>
+        @if (campaigns().length > 0) {
+          <div class="bar-list">
+            @for (c of campaigns(); track c.id) {
+              <div class="bar-row">
+                <span class="bar-label">{{ c.name }} <em class="status-chip" [class.running]="c.status === 'running'">{{ c.status }}</em></span>
+                <div class="bar-track"><div class="bar-fill" [style.width.%]="barWidth(c.sent, campaignsMax())"></div></div>
+                <span class="bar-value">{{ c.sent }} sent · {{ c.replied }} replies · {{ c.reply_rate_percent }}%</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty">No campaigns yet.</p>
+        }
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-head"><h2>Top companies</h2></div>
+        @if (topCompanies().length > 0) {
+          <div class="bar-list">
+            @for (tc of topCompanies(); track tc.company) {
+              <div class="bar-row">
+                <span class="bar-label">{{ tc.company }}</span>
+                <div class="bar-track"><div class="bar-fill company" [style.width.%]="barWidth(tc.count, companiesMax())"></div></div>
+                <span class="bar-value">{{ tc.count }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty">No company data yet.</p>
+        }
+      </div>
+    </div>
+
+    <!-- Sentiment -->
+    <div class="charts-grid">
+      <div class="card chart-card">
+        <div class="card-head"><h2>Reply sentiment</h2></div>
+        @if (sentimentEntries().length > 0) {
+          <div class="bar-list">
+            @for (s of sentimentEntries(); track s.label) {
+              <div class="bar-row">
+                <span class="bar-label">{{ s.label }}</span>
+                <div class="bar-track"><div class="bar-fill sentiment" [style.width.%]="barWidth(s.value, sentimentMax())"></div></div>
+                <span class="bar-value">{{ s.value }}</span>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="empty">No replies yet.</p>
+        }
+      </div>
+
+      <div class="card chart-card">
+        <div class="card-head"><h2>Best send time</h2></div>
+        @if (bestSendTime(); as bst) {
+          @if (bst.day && bst.hour !== null) {
+            <div class="sendtime-wrap">
+              <div class="sendtime-day">{{ bst.day }}</div>
+              <div class="sendtime-hour">
+                {{ (bst.hour % 12 === 0 ? 12 : bst.hour % 12) }}:00 {{ bst.hour < 12 ? 'AM' : 'PM' }}
+              </div>
+              <p>Your emails get the most opens at this time — schedule high-priority campaigns around it.</p>
+            </div>
+          } @else {
+            <p class="empty">{{ bst.label }}</p>
+          }
+        }
+      </div>
+    </div>
+
+  }
+}

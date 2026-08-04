@@ -1,0 +1,80 @@
+<div class="page-header">
+  <h1>Campaigns</h1>
+  <button class="btn" (click)="showForm.set(!showForm())">
+    {{ showForm() ? 'Cancel' : '+ New campaign' }}
+  </button>
+</div>
+
+@if (lastMessage()) {
+  <div class="notice">{{ lastMessage() }}</div>
+}
+
+@if (showForm()) {
+  <div class="card form-card">
+    <h2>New campaign</h2>
+    <div class="form-grid">
+      <label>
+        Campaign name
+        <input type="text" [(ngModel)]="name" placeholder="e.g. Repair shops Q3 outreach" />
+      </label>
+      <label>
+        Sequence
+        <select [(ngModel)]="sequenceId">
+          <option [ngValue]="null">Select a sequence…</option>
+          @for (s of sequences(); track s.id) {
+            <option [ngValue]="s.id">{{ s.name }}</option>
+          }
+        </select>
+      </label>
+    </div>
+    @if (sequences().length === 0) {
+      <p class="hint">You need to create a sequence first (see the Sequences page).</p>
+    }
+    <button class="btn" [disabled]="creating() || !name.trim() || !sequenceId" (click)="create()">
+      {{ creating() ? 'Creating…' : 'Create campaign' }}
+    </button>
+  </div>
+}
+
+<div class="card">
+  <h2>All campaigns</h2>
+  @if (loading()) {
+    <p class="empty">Loading…</p>
+  } @else if (campaigns().length === 0) {
+    <p class="empty">No campaigns yet.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Sequence</th>
+          <th>Status</th>
+          <th>Started</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (c of campaigns(); track c.id) {
+          <tr>
+            <td>{{ c.name }}</td>
+            <td>{{ c.sequence?.name || '—' }}</td>
+            <td><span [class]="statusClass(c.status)">{{ c.status }}</span></td>
+            <td>{{ c.started_at ? (c.started_at | date: 'short') : '—' }}</td>
+            <td class="actions">
+              @if (c.status === 'draft' || c.status === 'paused') {
+                <button class="btn small" [disabled]="actingOn() === c.id" (click)="start(c)">
+                  {{ actingOn() === c.id ? 'Starting…' : (c.status === 'paused' ? 'Resume' : 'Start') }}
+                </button>
+              }
+              @if (c.status === 'running') {
+                <button class="btn small danger" [disabled]="actingOn() === c.id" (click)="pause(c)">
+                  {{ actingOn() === c.id ? 'Pausing…' : 'Pause' }}
+                </button>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

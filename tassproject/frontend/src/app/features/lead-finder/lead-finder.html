@@ -1,0 +1,108 @@
+<div class="page-header">
+  <h1>Lead Finder</h1>
+  <button class="btn" (click)="showForm.set(!showForm())">
+    {{ showForm() ? 'Cancel' : '+ New target profile' }}
+  </button>
+</div>
+
+@if (hunterStatus(); as hunter) {
+  <div class="integration-banner">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <span><b>Email finder:</b> {{ hunter.configured ? 'Hunter.io live' : 'Demo mode' }}</span>
+    <span class="integration-banner-detail">{{ hunter.detail }}</span>
+  </div>
+}
+
+@if (showForm()) {
+  <div class="card form-card">
+    <h2>New target profile</h2>
+    <div class="form-grid">
+      <label>
+        Profile name
+        <input type="text" [(ngModel)]="form.name" placeholder="e.g. Repair shops in Tunisia" />
+      </label>
+      <label>
+        Industry
+        <input type="text" [(ngModel)]="form.industry" placeholder="e.g. electronics repair" />
+      </label>
+      <label>
+        Job title
+        <input type="text" [(ngModel)]="form.job_title" placeholder="e.g. owner, manager" />
+      </label>
+      <label>
+        Location
+        <input type="text" [(ngModel)]="form.location" placeholder="e.g. Sousse, Tunisia" />
+      </label>
+      <label class="full">
+        Keywords (comma-separated)
+        <input type="text" [(ngModel)]="form.keywordsRaw" placeholder="électronique, atelier, réparation" />
+      </label>
+    </div>
+    <button class="btn" [disabled]="creatingProfile() || !form.name.trim()" (click)="submitProfile()">
+      {{ creatingProfile() ? 'Saving…' : 'Save profile' }}
+    </button>
+  </div>
+}
+
+<div class="card">
+  <h2>Saved profiles</h2>
+  @if (loadingProfiles()) {
+    <p class="empty">Loading…</p>
+  } @else if (profiles().length === 0) {
+    <p class="empty">No target profiles yet. Create one above to get started.</p>
+  } @else {
+    <div class="profile-list">
+      @for (p of profiles(); track p.id) {
+        <div class="profile-row">
+          <div>
+            <div class="profile-name">{{ p.name }}</div>
+            <div class="profile-meta">
+              @if (p.industry) { <span>{{ p.industry }}</span> }
+              @if (p.job_title) { <span>{{ p.job_title }}</span> }
+              @if (p.location) { <span>{{ p.location }}</span> }
+              @if (p.keywords?.length) { <span>{{ p.keywords!.join(', ') }}</span> }
+            </div>
+          </div>
+          <div class="profile-actions">
+            <button class="btn small" [disabled]="starting() === p.id" (click)="startScrape(p)">
+              {{ starting() === p.id ? 'Starting…' : 'Start scrape' }}
+            </button>
+            <button class="btn small danger" (click)="deleteProfile(p.id)">Delete</button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<div class="card">
+  <h2>Recent scrape jobs</h2>
+  @if (jobs().length === 0) {
+    <p class="empty">No scrape jobs yet.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Profile</th>
+          <th>Status</th>
+          <th>Queries</th>
+          <th>Leads found</th>
+          <th>Enriched</th>
+          <th>Started</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (job of jobs(); track job.id) {
+          <tr>
+            <td>{{ job.profile?.name || '—' }}</td>
+            <td><span [class]="statusClass(job.status)">{{ job.status }}</span></td>
+            <td>{{ job.queries_run }}</td>
+            <td>{{ job.leads_found }}</td>
+            <td>{{ job.emails_enriched }}</td>
+            <td>{{ job.created_at | date: 'short' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

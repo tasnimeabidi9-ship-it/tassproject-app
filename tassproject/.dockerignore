@@ -1,0 +1,11 @@
+backend/vendor/
+backend/node_modules/
+frontend/node_modules/
+frontend/dist/
+job-service/node_modules/
+scraper/venv/
+scraper/__pycache__/
+scraper/ml/__pycache__/
+**/.git
+**/.env
+*.pyc
