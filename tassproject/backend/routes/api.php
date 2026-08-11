@@ -7,6 +7,7 @@ use App\Http\Controllers\CampaignController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\InternalMessageController;
 use App\Http\Controllers\LeadController;
+use App\Http\Controllers\PlacePreviewController;
 use App\Http\Controllers\PowerBiController;
 use App\Http\Controllers\ReplyController;
 use App\Http\Controllers\ScraperController;
@@ -64,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/scraper/jobs', [ScraperController::class, 'recentJobs']);
     Route::middleware('role:admin,rep')->group(function () {
         Route::post('/scraper/start', [ScraperController::class, 'start']);
+        Route::post('/leads/preview-search', [PlacePreviewController::class, 'search']);
     });
 
     Route::get('/sequences', [SequenceController::class, 'index']);

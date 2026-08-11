@@ -43,3 +43,13 @@ export interface PaginatedResponse<T> {
   per_page: number;
   total: number;
 }
+
+export interface PlacePreviewResult {
+  name: string | null;
+  address: string | null;
+  website: string | null;
+  phone: string | null;
+  rating: number | null;
+  rating_count: number | null;
+  category: string | null;
+}

@@ -34,6 +34,7 @@ analysis, and turns everything into actionable analytics dashboards.
 | Area | What it does |
 | --- | --- |
 | **Lead Finder** | Target profiles → Google search queries → lead discovery. Hunter.io email enrichment with confidence scoring, dedup, and an ML match score per lead. |
+| **Company preview** | "Preview real companies" panel on the Lead Finder page — type a search (e.g. "electronics repair shops" + "Sousse, Tunisia") and instantly see actual existing businesses via Google Places (name, address, website, phone, rating) before running a full scrape. Nothing is saved. "Use as profile seed" pre-fills a new target profile. |
 | **Lead Queue** | Manual + automatic approval of scraped leads. Score-driven auto-approval keeps the queue clean while everything above threshold skips straight to outreach. |
 | **Contacts & Pipeline** | Single view of every lead through the 6-stage pipeline (`lead_found → approved → contacted → replied → interested → won/lost`). Drag-and-drop pipeline board. |
 | **Sequences** | Multi-step outreach templates with placeholders (`{{name}}`, `{{company}}`), step delays, and email/SMS channels. |

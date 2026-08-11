@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { LeadService } from '../../core/services/lead.service';
 import { SettingsService } from '../../core/services/settings.service';
-import { ScrapeJob, TargetProfile } from '../../core/models/lead.model';
+import { PlacePreviewResult, ScrapeJob, TargetProfile } from '../../core/models/lead.model';
 import { IntegrationStatus } from '../../core/models/settings.model';
 
 @Component({
@@ -31,6 +31,14 @@ export class LeadFinder implements OnInit {
   };
 
   private pollHandle: ReturnType<typeof setInterval> | null = null;
+
+  // Real-company preview panel
+  previewQuery = '';
+  previewLocation = '';
+  previewResults = signal<PlacePreviewResult[]>([]);
+  previewLoading = signal(false);
+  previewError = signal<string | null>(null);
+  previewSearched = signal(false);
 
   constructor(private leadApi: LeadService, private settingsApi: SettingsService) {}
 
@@ -118,5 +126,34 @@ export class LeadFinder implements OnInit {
 
   statusClass(status: string): string {
     return `status status-${status}`;
+  }
+
+  runPreview() {
+    if (!this.previewQuery.trim()) return;
+
+    this.previewLoading.set(true);
+    this.previewError.set(null);
+    this.previewSearched.set(true);
+
+    this.leadApi.previewSearch(this.previewQuery, this.previewLocation || undefined).subscribe({
+      next: (res) => {
+        this.previewLoading.set(false);
+        this.previewResults.set(res.results || []);
+        if (res.message) this.previewError.set(res.message);
+      },
+      error: (err) => {
+        this.previewLoading.set(false);
+        this.previewResults.set([]);
+        this.previewError.set(err.error?.message || 'Preview search failed.');
+      },
+    });
+  }
+
+  useAsProfileSeed(place: PlacePreviewResult) {
+    // Quick way to jump from "found a real example" straight into
+    // creating a target profile seeded with that category/location.
+    this.showForm.set(true);
+    if (place.category && !this.form.industry) this.form.industry = place.category;
+    if (this.previewLocation && !this.form.location) this.form.location = this.previewLocation;
   }
 }

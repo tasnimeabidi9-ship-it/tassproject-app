@@ -24,6 +24,7 @@ describe('LeadFinder', () => {
             createProfile: () => of({}),
             deleteProfile: () => of({}),
             startScrape: () => of({}),
+            previewSearch: () => of({ results: [] }),
           },
         },
         {
@@ -64,6 +65,25 @@ describe('LeadFinder', () => {
     const fixture = TestBed.createComponent(LeadFinder);
     const status = fixture.componentInstance.statusClass('completed');
     expect(status).toBe('status status-completed');
+    fixture.destroy();
+  });
+
+  it('seeds the new-profile form from a preview result', () => {
+    const fixture = TestBed.createComponent(LeadFinder);
+    fixture.componentInstance.previewLocation = 'Sousse, Tunisia';
+    fixture.componentInstance.useAsProfileSeed({
+      name: 'Tech Repair',
+      category: 'Electronics repair shop',
+      address: null,
+      website: null,
+      phone: null,
+      rating: null,
+      rating_count: null,
+    });
+
+    expect(fixture.componentInstance.showForm()).toBe(true);
+    expect(fixture.componentInstance.form.industry).toBe('Electronics repair shop');
+    expect(fixture.componentInstance.form.location).toBe('Sousse, Tunisia');
     fixture.destroy();
   });
 });

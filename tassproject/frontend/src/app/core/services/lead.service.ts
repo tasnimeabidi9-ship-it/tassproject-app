@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { LeadQueueItem, PaginatedResponse, ScrapeJob, TargetProfile } from '../models/lead.model';
+import { LeadQueueItem, PaginatedResponse, PlacePreviewResult, ScrapeJob, TargetProfile } from '../models/lead.model';
 
 @Injectable({ providedIn: 'root' })
 export class LeadService {
@@ -66,5 +66,13 @@ export class LeadService {
     return this.http.post<{ approved_count: number }>(`${this.base}/leads/bulk-approve`, {
       min_score: minScore,
     });
+  }
+
+  // Real-company preview (Google Places) — separate from the full scrape
+  previewSearch(query: string, location?: string): Observable<{ results: PlacePreviewResult[]; message?: string }> {
+    return this.http.post<{ results: PlacePreviewResult[]; message?: string }>(
+      `${this.base}/leads/preview-search`,
+      { query, location }
+    );
   }
 }

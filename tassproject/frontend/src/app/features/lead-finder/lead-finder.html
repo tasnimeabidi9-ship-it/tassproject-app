@@ -13,6 +13,61 @@
   </div>
 }
 
+<div class="card preview-card">
+  <h2>Preview real companies</h2>
+  <p class="hint">
+    Type a search to instantly see actual existing businesses (via Google
+    Places) before committing to a full scrape job. This is a quick lookup —
+    it doesn't save anything or use Hunter.io credits.
+  </p>
+  <div class="preview-form">
+    <input
+      type="text"
+      placeholder="e.g. electronics repair shops"
+      [(ngModel)]="previewQuery"
+      (keyup.enter)="runPreview()"
+    />
+    <input
+      type="text"
+      placeholder="Location (e.g. Sousse, Tunisia)"
+      [(ngModel)]="previewLocation"
+      (keyup.enter)="runPreview()"
+    />
+    <button class="btn" [disabled]="previewLoading() || !previewQuery.trim()" (click)="runPreview()">
+      {{ previewLoading() ? 'Searching…' : 'Search' }}
+    </button>
+  </div>
+
+  @if (previewError()) {
+    <p class="preview-error">{{ previewError() }}</p>
+  }
+
+  @if (previewSearched() && !previewLoading() && previewResults().length === 0 && !previewError()) {
+    <p class="empty">No results for that search.</p>
+  }
+
+  @if (previewResults().length > 0) {
+    <div class="preview-results">
+      @for (place of previewResults(); track place.name) {
+        <div class="preview-place">
+          <div class="preview-place-main">
+            <div class="preview-place-name">{{ place.name || 'Unnamed' }}</div>
+            <div class="preview-place-meta">
+              @if (place.category) { <span>{{ place.category }}</span> }
+              @if (place.address) { <span>{{ place.address }}</span> }
+              @if (place.rating) { <span>★ {{ place.rating }} ({{ place.rating_count }})</span> }
+            </div>
+            @if (place.website) {
+              <a [href]="place.website" target="_blank" rel="noopener" class="preview-place-link">{{ place.website }}</a>
+            }
+          </div>
+          <button class="btn small secondary" (click)="useAsProfileSeed(place)">Use as profile seed</button>
+        </div>
+      }
+    </div>
+  }
+</div>
+
 @if (showForm()) {
   <div class="card form-card">
     <h2>New target profile</h2>
