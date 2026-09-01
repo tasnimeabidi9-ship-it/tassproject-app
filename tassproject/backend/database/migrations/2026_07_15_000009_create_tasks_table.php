@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('due_date')->nullable();
-            $table->string('status')->default('open'); // open / done / cancelled
+            $table->string('status')->default('todo'); // todo / in_progress / done / cancelled
             $table->boolean('created_by_ai')->default(false);
             $table->timestamps();
 

@@ -24,7 +24,8 @@
     <span>{{ error() }}</span>
     <button class="retry-btn" (click)="load()">Try again</button>
   </div>
-} @else if (overview(); as o) {
+} @else if (overview()) {
+  @let o = overview()!;
 
   @if (!hasData()) {
     <div class="analytics-empty">
@@ -120,6 +121,9 @@
               <polyline [attr.points]="timelinePoints('opened')" fill="none" class="line opened"/>
               <polyline [attr.points]="timelinePoints('replied')" fill="none" class="line replied"/>
               <polyline [attr.points]="timelinePoints('sent')" fill="none" class="line sent"/>
+              @if (timelineLastValue('sent'); as ev) { <circle [attr.cx]="ev.x" [attr.cy]="ev.y" r="3" class="marker sent"/> }
+              @if (timelineLastValue('opened'); as ev) { <circle [attr.cx]="ev.x" [attr.cy]="ev.y" r="3" class="marker opened"/> }
+              @if (timelineLastValue('replied'); as ev) { <circle [attr.cx]="ev.x" [attr.cy]="ev.y" r="3" class="marker replied"/> }
               @for (l of xLabels(); track l.x) {
                 <text [attr.x]="l.x" y="236" class="grid-label" text-anchor="middle">{{ l.label }}</text>
               }
@@ -185,7 +189,7 @@
 
       <div class="card chart-card span-2">
         <div class="card-head"><h2>Sales pipeline — contacts by stage</h2></div>
-        @if (pipeline().some((p) => p.count > 0)) {
+        @if (hasPipelineData()) {
           <div class="bar-list funnel">
             @for (p of pipeline(); track p.stage) {
               @if (p.count > 0) {

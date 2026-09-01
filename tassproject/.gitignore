@@ -1,0 +1,9 @@
+# Local build output & caches (not source)
+frontend/dist/
+frontend/.angular/
+
+# Composer vendors (installed by Docker, not committed)
+backend/vendor/
+
+# Local-only SQLite scratch database (Docker uses MySQL)
+backend/database/database.sqlite

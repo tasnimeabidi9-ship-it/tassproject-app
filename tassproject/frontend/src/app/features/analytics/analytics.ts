@@ -33,14 +33,14 @@ const SENTIMENT_LABELS: Record<string, string> = {
 };
 
 const DONUT_COLORS = [
+  '#04302b',
+  '#065f56',
+  '#077a6c',
   '#0d8a7c',
   '#12a496',
   '#3dbfae',
   '#6fd3c6',
   '#9be6dc',
-  '#065f56',
-  '#c5f1eb',
-  '#04302b',
 ];
 
 @Component({
@@ -245,6 +245,10 @@ export class Analytics implements OnInit {
 
   pipelineMax(): number {
     return this.maxOf(this.pipeline());
+  }
+
+  hasPipelineData(): boolean {
+    return this.pipeline().some((p) => p.count > 0);
   }
 
   topCompanies() {

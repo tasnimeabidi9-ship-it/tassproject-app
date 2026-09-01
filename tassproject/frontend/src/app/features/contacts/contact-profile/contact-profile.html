@@ -1,6 +1,7 @@
 @if (loading()) {
   <p>Loading…</p>
-} @else if (contact(); as c) {
+} @else if (contact()) {
+  @let c = contact()!;
   <a routerLink="/contacts" class="back-link">&larr; Back to contacts</a>
 
   <div class="profile-grid">

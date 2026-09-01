@@ -2,7 +2,7 @@ FROM php:8.2-cli
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git unzip libzip-dev libpng-dev libonig-dev curl \
+    git unzip libzip-dev libpng-dev libonig-dev libpq-dev curl \
     && docker-php-ext-install pdo_mysql pdo_pgsql zip mbstring exif pcntl bcmath gd \
     && rm -rf /var/lib/apt/lists/*
 

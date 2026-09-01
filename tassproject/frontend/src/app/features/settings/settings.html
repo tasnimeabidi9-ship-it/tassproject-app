@@ -21,7 +21,8 @@
     <span>{{ error() }}</span>
     <button class="retry-btn" (click)="load()">Try again</button>
   </div>
-} @else if (data(); as d) {
+} @else if (data()) {
+  @let d = data()!;
 
   <!-- Integrations -->
   <div class="card">

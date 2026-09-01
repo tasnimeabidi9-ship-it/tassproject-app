@@ -9,7 +9,8 @@
       <div class="spinner"></div>
       <span>Loading dashboard&hellip;</span>
     </div>
-  } @else if (data(); as d) {
+  } @else if (data()) {
+    @let d = data()!;
     <div class="kpi-grid">
       <div class="kpi-card">
         <div class="kpi-icon leads">

@@ -11,7 +11,7 @@ cp -r dist/frontend/browser/* /app/public/
 
 # Laravel setup
 cd /app
-php artisan key:generate --force
+php artisan key:generate --force 2>/dev/null || true
 php artisan migrate --force 2>/dev/null || true
 php artisan db:seed --class=UserSeeder --force 2>/dev/null || true
 php artisan db:seed --class=DemoDataSeeder --force 2>/dev/null || true

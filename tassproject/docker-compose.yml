@@ -58,6 +58,7 @@ services:
     environment:
       APP_ENV: production
       APP_DEBUG: "false"
+      APP_KEY: base64:CY14TV6JePsg3gMHWLWH1Io0sby6CjldwtXXxEM69tI=
       APP_URL: http://localhost:8000
       FRONTEND_URL: http://localhost:8000
       DB_CONNECTION: mysql
@@ -68,7 +69,7 @@ services:
       DB_PASSWORD: tasspass123
       REDIS_HOST: redis
       REDIS_PORT: "6379"
-      INTERNAL_SERVICE_SECRET: ${INTERNAL_SECRET:-change-me-in-your-compose-env}
+      INTERNAL_SERVICE_SECRET: ${INTERNAL_SECRET:-change-me-to-a-long-random-string}
       PORT: "8000"
 
   scraper:
