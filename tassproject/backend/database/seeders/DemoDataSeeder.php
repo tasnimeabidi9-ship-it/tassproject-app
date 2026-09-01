@@ -44,11 +44,11 @@ class DemoDataSeeder extends Seeder
         ]);
 
         $leadNames = [
-            ['Karim Sassi', 'karim.sassi@atelier-sassi.tn', 'atelier-sassi.tn', 82, 88, 'approved'],
-            ['Nadia Ferjani', 'nadia@techfix-tunis.com', 'techfix-tunis.com', 74, 91, 'approved'],
-            ['Mounir Gharbi', 'mounir@reparelec.tn', 'reparelec.tn', 65, 70, 'pending_review'],
-            ['Yassmine Cherif', 'yassmine@electro-plus.tn', 'electro-plus.tn', 58, 62, 'pending_review'],
-            ['Bilel Trabelsi', 'bilel@fixitnow.tn', 'fixitnow.tn', 45, 55, 'rejected'],
+            ['Karim Sassi', 'karim.sassi@atelier-electronique-sousse.tn', 'atelier-electronique-sousse.tn', 82, 88, 'approved'],
+            ['Nadia Ferjani', 'nadia@techfixpro.tn', 'techfixpro.tn', 74, 91, 'approved'],
+            ['Mounir Gharbi', 'mounir@electroplus-sfax.tn', 'electroplus-sfax.tn', 65, 70, 'pending_review'],
+            ['Yassmine Cherif', 'yassmine@reparation-rapide-bizerte.tn', 'reparation-rapide-bizerte.tn', 58, 62, 'pending_review'],
+            ['Bilel Trabelsi', 'bilel@mecafix-sousse.tn', 'mecafix-sousse.tn', 45, 55, 'rejected'],
         ];
 
         foreach ($leadNames as [$name, $email, $domain, $confidence, $match, $status]) {
@@ -83,13 +83,13 @@ class DemoDataSeeder extends Seeder
         ]);
 
         $contactsData = [
-            ['Amine Ben Ali', 'amine.benali@atelier-tn-test.com', 'Atelier Amine', 'atelier-tn-test.com', 78, 'won'],
-            ['Sara Trabelsi', 'sara.trabelsi@hisebi-test.com', 'Hisebi Freelance', 'hisebi-test.com', 85, 'interested'],
-            ['Rania Jendoubi', 'rania@mecaplus.tn', 'Meca Plus Sousse', 'mecaplus.tn', 71, 'contacted'],
-            ['Khalil Zribi', 'khalil@electrofix.tn', 'ElectroFix', 'electrofix.tn', 60, 'approved'],
-            ['Wafa Bouazizi', 'wafa@reparation-express.tn', 'Reparation Express', 'reparation-express.tn', 40, 'lost'],
-            ['Fares Hammami', 'fares@techrepair-sfax.tn', 'TechRepair Sfax', 'techrepair-sfax.tn', 92, 'won'],
-            ['Ines Mabrouk', 'ines@atelierplus.tn', 'Atelier Plus', 'atelierplus.tn', 55, 'lead_found'],
+            ['Amine Ben Ali', 'amine@atelier-electronique-sousse.tn', 'Atelier Electronique Sousse', 'atelier-electronique-sousse.tn', 78, 'won'],
+            ['Sara Trabelsi', 'sara@techfixpro.tn', 'TechFix Pro', 'techfixpro.tn', 85, 'interested'],
+            ['Rania Jendoubi', 'rania@electroplus-sfax.tn', 'Electro Plus Sfax', 'electroplus-sfax.tn', 71, 'contacted'],
+            ['Khalil Zribi', 'khalil@reparation-rapide-bizerte.tn', 'Reparation Rapide Bizerte', 'reparation-rapide-bizerte.tn', 60, 'approved'],
+            ['Wafa Bouazizi', 'wafa@informatique-tunis.tn', 'Informatique Tunis', 'informatique-tunis.tn', 40, 'lost'],
+            ['Fares Hammami', 'fares@mecafix-sousse.tn', 'MecaFix Sousse', 'mecafix-sousse.tn', 92, 'won'],
+            ['Ines Mabrouk', 'ines@telecomplus-gafsa.tn', 'Telecom Plus Gafsa', 'telecomplus-gafsa.tn', 55, 'lead_found'],
         ];
 
         $contacts = [];
