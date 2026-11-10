@@ -84,7 +84,8 @@ export class PowerBiEmbed implements OnChanges, OnDestroy {
       error: (err) => {
         this.loading.set(false);
         this.error.set(
-          'Unable to load this report. Please check your connection and try again.'
+          err?.error?.message ??
+            'Unable to load this report. Please check your connection and try again.'
         );
       },
     });

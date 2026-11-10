@@ -60,6 +60,15 @@ export class Settings implements OnInit {
     }));
   }
 
+  /**
+   * Power BI is optional and has no mock mode, so it reads "Off" rather
+   * than "Mock" when it is not configured.
+   */
+  integrationBadge(int: { key: string; configured: boolean }): string {
+    if (int.configured) return 'Live';
+    return int.key === 'powerbi' ? 'Off' : 'Mock';
+  }
+
   save() {
     this.saving.set(true);
     this.saved.set(false);

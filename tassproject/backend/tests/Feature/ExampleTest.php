@@ -12,6 +12,10 @@ class ExampleTest extends TestCase
      */
     public function test_the_application_returns_a_successful_response(): void
     {
+        if (!is_file(public_path('index.html'))) {
+            $this->markTestSkipped('The compiled SPA is not present in backend/public.');
+        }
+
         $response = $this->get('/');
 
         $response->assertStatus(200);

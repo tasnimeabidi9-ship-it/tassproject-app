@@ -283,3 +283,37 @@
 
   }
 }
+
+@if (powerbiReports().length > 0) {
+  <div class="card powerbi-card">
+    <div class="card-head">
+      <div>
+        <h2>Power BI reports</h2>
+        <p class="powerbi-sub">Embedded report from your Power BI workspace.</p>
+      </div>
+      <div class="powerbi-actions">
+        @if (powerbiReports().length > 1) {
+          <select
+            class="powerbi-select"
+            [value]="selectedPowerBi()"
+            (change)="selectPowerBi($event)"
+            aria-label="Select Power BI report"
+          >
+            @for (report of powerbiReports(); track report.key) {
+              <option [value]="report.key">{{ report.label }}</option>
+            }
+          </select>
+        }
+        @if (selectedExternalUrl(); as url) {
+          <a class="powerbi-link" [href]="url" target="_blank" rel="noopener">
+            Open in Power BI
+          </a>
+        }
+      </div>
+    </div>
+
+    @if (selectedPowerBi(); as report) {
+      <app-powerbi-embed [report]="report" />
+    }
+  </div>
+}

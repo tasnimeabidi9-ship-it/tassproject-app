@@ -8,20 +8,27 @@ use Illuminate\Support\Facades\Http;
 
 class PowerBiController extends Controller
 {
+    private const REPORT_KEYS = ['campaign', 'leadfinder', 'pipeline'];
+
+    private const REPORT_LABELS = [
+        'campaign' => 'Campaign Performance',
+        'leadfinder' => 'Lead Finder Report',
+        'pipeline' => 'Sales Pipeline Report',
+    ];
+
     public function embedToken(Request $request)
     {
         $reportKey = $request->query('report', 'campaign');
 
-        $reportIds = [
-            'campaign' => env('POWERBI_REPORT_ID_CAMPAIGN'),
-            'leadfinder' => env('POWERBI_REPORT_ID_LEADFINDER'),
-            'pipeline' => env('POWERBI_REPORT_ID_PIPELINE'),
-        ];
+        if (!in_array($reportKey, self::REPORT_KEYS, true)) {
+            return response()->json([
+                'message' => "Unknown report '{$reportKey}'.",
+            ], 422);
+        }
 
-        $reportId = $reportIds[$reportKey] ?? null;
-        $workspaceId = env('POWERBI_WORKSPACE_ID');
+        $report = $this->reportConfig($reportKey);
 
-        if (!$reportId || !$workspaceId) {
+        if (!$report['configured']) {
             return response()->json([
                 'message' => "Report '{$reportKey}' is not configured.",
             ], 422);
@@ -35,71 +42,125 @@ class PowerBiController extends Controller
         }
 
         try {
+            $reportInfo = Http::withToken($aadToken)
+                ->timeout(15)
+                ->get("https://api.powerbi.com/v1.0/myorg/groups/{$report['workspace_id']}/reports/{$report['report_id']}");
+
+            if (!$reportInfo->successful() || !$reportInfo->json('embedUrl')) {
+                return response()->json([
+                    'message' => 'Could not load the Power BI report details.',
+                ], 502);
+            }
+
             $response = Http::withToken($aadToken)
                 ->timeout(15)
-                ->post("https://api.powerbi.com/v1.0/myorg/groups/{$workspaceId}/reports/{$reportId}/GenerateToken", [
+                ->post("https://api.powerbi.com/v1.0/myorg/groups/{$report['workspace_id']}/reports/{$report['report_id']}/GenerateToken", [
                     'accessLevel' => 'View',
                 ]);
 
-            if (!$response->successful()) {
+            if (!$response->successful() || !$response->json('token')) {
                 return response()->json([
                     'message' => 'Power BI API rejected the token request.',
                 ], 502);
             }
 
-            $reportInfo = Http::withToken($aadToken)
-                ->get("https://api.powerbi.com/v1.0/myorg/groups/{$workspaceId}/reports/{$reportId}")
-                ->json();
-
             return response()->json([
                 'embedToken' => $response->json('token'),
-                'embedUrl' => $reportInfo['embedUrl'] ?? null,
-                'reportId' => $reportId,
+                'embedUrl' => $reportInfo->json('embedUrl'),
+                'reportId' => $report['report_id'],
+                'expiresAt' => $response->json('expiration'),
             ]);
         } catch (\Throwable $e) {
-            return response()->json(['message' => 'Power BI embed token request failed.'], 500);
+            return response()->json([
+                'message' => 'Power BI embed token request failed.',
+            ], 500);
         }
     }
 
     public function config()
     {
-        $workspaceId = env('POWERBI_WORKSPACE_ID');
+        $reports = [];
 
-        $reports = [
-            'campaign' => ['label' => 'Campaign Performance', 'id' => env('POWERBI_REPORT_ID_CAMPAIGN')],
-            'leadfinder' => ['label' => 'Lead Finder Report', 'id' => env('POWERBI_REPORT_ID_LEADFINDER')],
-            'pipeline' => ['label' => 'Sales Pipeline Report', 'id' => env('POWERBI_REPORT_ID_PIPELINE')],
-        ];
+        foreach (self::REPORT_KEYS as $key) {
+            $report = $this->reportConfig($key);
 
-        foreach ($reports as $key => &$r) {
-            $r['configured'] = !empty($r['id']) && !empty($workspaceId);
-            $r['external_url'] = $r['configured']
-                ? "https://app.powerbi.com/groups/{$workspaceId}/reports/{$r['id']}"
-                : null;
+            $reports[$key] = [
+                'label' => $report['label'],
+                'id' => $report['report_id'] ?: null,
+                'configured' => $report['configured'],
+                'external_url' => $report['configured']
+                    ? "https://app.powerbi.com/groups/{$report['workspace_id']}/reports/{$report['report_id']}"
+                    : null,
+            ];
         }
 
         return response()->json(['reports' => $reports]);
     }
 
+    /**
+     * Resolve one report's configuration from config/services.php.
+     *
+     * config() is used instead of env() so the values still resolve when
+     * the application runs with a cached configuration (php artisan config:cache).
+     */
+    private function reportConfig(string $key): array
+    {
+        $config = config('services.powerbi', []);
+        $reportId = $config["report_id_{$key}"] ?? '';
+
+        return [
+            'label' => self::REPORT_LABELS[$key],
+            'workspace_id' => $config['workspace_id'] ?? '',
+            'report_id' => $reportId,
+            'configured' => $this->credentialsConfigured() && !empty($reportId),
+        ];
+    }
+
+    private function credentialsConfigured(): bool
+    {
+        $config = config('services.powerbi', []);
+
+        foreach (['workspace_id', 'tenant_id', 'client_id', 'client_secret'] as $key) {
+            if (empty($config[$key])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function getAadToken(): ?string
     {
-        return Cache::remember('powerbi_aad_token', 3000, function () {
-            $tenantId = env('POWERBI_TENANT_ID');
-            $clientId = env('POWERBI_CLIENT_ID');
-            $clientSecret = env('POWERBI_CLIENT_SECRET');
+        $cached = Cache::get('powerbi_aad_token');
+        if ($cached) {
+            return $cached;
+        }
 
-            if (!$tenantId || !$clientId || !$clientSecret) {
-                return null;
-            }
+        $tenantId = config('services.powerbi.tenant_id');
+        $clientId = config('services.powerbi.client_id');
+        $clientSecret = config('services.powerbi.client_secret');
 
-            $response = Http::asForm()->post("https://login.microsoftonline.com/{$tenantId}/oauth2/v2.0/token", [
+        if (!$tenantId || !$clientId || !$clientSecret) {
+            return null;
+        }
+
+        $response = Http::asForm()
+            ->timeout(15)
+            ->post("https://login.microsoftonline.com/{$tenantId}/oauth2/v2.0/token", [
                 'grant_type' => 'client_credentials',
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret,
                 'scope' => 'https://analysis.windows.net/powerbi/api/.default',
             ]);
 
-            return $response->successful() ? $response->json('access_token') : null;
-        });
+        $token = $response->successful() ? $response->json('access_token') : null;
+
+        // Only cache successful tokens, so a transient failure can be retried
+        // on the next request instead of being remembered for 50 minutes.
+        if ($token) {
+            Cache::put('powerbi_aad_token', $token, 3000);
+        }
+
+        return $token;
     }
 }

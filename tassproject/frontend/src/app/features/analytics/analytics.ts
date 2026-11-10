@@ -2,6 +2,15 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { AnalyticsService } from '../../core/services/analytics.service';
 import { AnalyticsOverview } from '../../core/models/analytics.model';
+import { PowerBiService, ReportKey } from '../../core/services/powerbi.service';
+import { PowerBiReportConfig } from '../../core/models/powerbi.model';
+import { PowerBiEmbed } from './powerbi/powerbi-embed';
+
+interface PowerBiReportOption {
+  key: ReportKey;
+  label: string;
+  external_url: string | null;
+}
 
 const STAGE_LABELS: Record<string, string> = {
   lead_found: 'Lead found',
@@ -46,7 +55,7 @@ const DONUT_COLORS = [
 @Component({
   selector: 'app-analytics',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, PowerBiEmbed],
   templateUrl: './analytics.html',
   styleUrl: './analytics.css',
 })
@@ -54,11 +63,17 @@ export class Analytics implements OnInit {
   overview = signal<AnalyticsOverview | null>(null);
   loading = signal(true);
   error = signal<string | null>(null);
+  powerbiReports = signal<PowerBiReportOption[]>([]);
+  selectedPowerBi = signal<ReportKey | null>(null);
 
-  constructor(private analytics: AnalyticsService) {}
+  constructor(
+    private analytics: AnalyticsService,
+    private powerbi: PowerBiService
+  ) {}
 
   ngOnInit() {
     this.load();
+    this.loadPowerBi();
   }
 
   load() {
@@ -74,6 +89,43 @@ export class Analytics implements OnInit {
         this.error.set('Could not load analytics. Please try again.');
       },
     });
+  }
+
+  /**
+   * Power BI is optional. Only render the embed section when at least one
+   * report is fully configured, otherwise keep the in-app SVG charts.
+   */
+  private loadPowerBi() {
+    this.powerbi.getConfig().subscribe({
+      next: (config) => {
+        const entries = Object.entries(config.reports) as Array<
+          [ReportKey, PowerBiReportConfig]
+        >;
+        const reports = entries
+          .filter(([, report]) => report.configured)
+          .map(([key, report]) => ({
+            key,
+            label: report.label,
+            external_url: report.external_url,
+          }));
+
+        this.powerbiReports.set(reports);
+        if (reports.length > 0 && !this.selectedPowerBi()) {
+          this.selectedPowerBi.set(reports[0].key);
+        }
+      },
+      error: () => this.powerbiReports.set([]),
+    });
+  }
+
+  selectPowerBi(event: Event) {
+    this.selectedPowerBi.set((event.target as HTMLSelectElement).value as ReportKey);
+  }
+
+  selectedExternalUrl(): string | null {
+    const key = this.selectedPowerBi();
+    if (!key) return null;
+    return this.powerbiReports().find((report) => report.key === key)?.external_url ?? null;
   }
 
   stageLabel(stage: string): string {

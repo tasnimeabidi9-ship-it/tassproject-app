@@ -298,6 +298,47 @@
   margin: 0;
 }
 
+/* ── Power BI embed ────────────────────────────────────────────── */
+
+.powerbi-card {
+  margin-top: 1.4rem;
+}
+
+.powerbi-sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--tplus-ink-300, #a9beb8);
+}
+
+.powerbi-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.powerbi-select {
+  padding: 0.45rem 0.7rem;
+  border: 1px solid #dce7e3;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--tplus-ink-700, #24443e);
+  font-family: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.powerbi-link {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--tplus-teal-700, #077a6c);
+  text-decoration: none;
+}
+
+.powerbi-link:hover {
+  text-decoration: underline;
+}
+
 /* ── Line chart ────────────────────────────────────────────────── */
 
 .line-chart {

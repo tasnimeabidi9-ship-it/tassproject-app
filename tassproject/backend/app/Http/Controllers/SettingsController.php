@@ -92,10 +92,35 @@ class SettingsController extends Controller
                 'detail' => empty(env('OPENAI_API_KEY')) ? 'Mock mode — template-based copy' : 'Personalised AI copy enabled',
             ],
             'powerbi' => [
-                'configured' => !empty(env('POWERBI_WORKSPACE_ID')),
+                'configured' => $this->powerBiConfigured(),
                 'label' => 'Power BI Embedded',
-                'detail' => empty(env('POWERBI_WORKSPACE_ID')) ? 'Not configured — in-app charts shown instead' : 'Embedded reports enabled',
+                'detail' => $this->powerBiConfigured()
+                    ? 'Embedded reports enabled'
+                    : 'Not configured — in-app charts shown instead',
             ],
         ];
+    }
+
+    /**
+     * Power BI needs the full service-principal credentials plus at least
+     * one report id before an embedded report can actually be rendered.
+     */
+    private function powerBiConfigured(): bool
+    {
+        $config = config('services.powerbi', []);
+
+        foreach (['workspace_id', 'tenant_id', 'client_id', 'client_secret'] as $key) {
+            if (empty($config[$key])) {
+                return false;
+            }
+        }
+
+        foreach (['report_id_campaign', 'report_id_leadfinder', 'report_id_pipeline'] as $key) {
+            if (!empty($config[$key])) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -30,3 +30,8 @@ job-service/.env
 
 # Build output
 frontend/dist/
+
+# Laravel generated caches
+tassproject/backend/bootstrap/cache/*.php
+tassproject/backend/storage/framework/views/*.php
+tassproject/backend/.phpunit.result.cache

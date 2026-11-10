@@ -42,7 +42,7 @@
             <div class="integration-detail" [class.on]="int.configured">{{ int.detail }}</div>
           </div>
           <span class="badge" [class.badge-on]="int.configured" [class.badge-off]="!int.configured">
-            {{ int.configured ? 'Live' : 'Mock' }}
+            {{ integrationBadge(int) }}
           </span>
         </div>
       }

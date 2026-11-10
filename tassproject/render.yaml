@@ -33,6 +33,20 @@ services:
         value: "6379"
       - key: INTERNAL_SERVICE_SECRET
         generateValue: true
+      - key: POWERBI_WORKSPACE_ID
+        sync: false
+      - key: POWERBI_TENANT_ID
+        sync: false
+      - key: POWERBI_CLIENT_ID
+        sync: false
+      - key: POWERBI_CLIENT_SECRET
+        sync: false
+      - key: POWERBI_REPORT_ID_CAMPAIGN
+        sync: false
+      - key: POWERBI_REPORT_ID_LEADFINDER
+        sync: false
+      - key: POWERBI_REPORT_ID_PIPELINE
+        sync: false
 
   - type: web
     name: tassproject-job-service
