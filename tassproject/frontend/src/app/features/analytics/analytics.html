@@ -115,9 +115,9 @@
                 <line x1="24" [attr.y1]="g.y" x2="696" [attr.y2]="g.y" class="grid-line"/>
                 <text x="18" [attr.y]="g.y" class="grid-label" text-anchor="end">{{ g.label }}</text>
               }
-              <polygon [attr.points]="timelineArea('sent')" fill="url(#areaSent)"/>
-              <polygon [attr.points]="timelineArea('opened')" fill="url(#areaOpened)"/>
-              <polygon [attr.points]="timelineArea('replied')" fill="url(#areaReplied)"/>
+              <path [attr.d]="timelineArea('sent')" fill="url(#areaSent)"/>
+              <path [attr.d]="timelineArea('opened')" fill="url(#areaOpened)"/>
+              <path [attr.d]="timelineArea('replied')" fill="url(#areaReplied)"/>
               <polyline [attr.points]="timelinePoints('opened')" fill="none" class="line opened"/>
               <polyline [attr.points]="timelinePoints('replied')" fill="none" class="line replied"/>
               <polyline [attr.points]="timelinePoints('sent')" fill="none" class="line sent"/>

@@ -18,7 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => EnsureUserHasRole::class,
             'internal.secret' => VerifyInternalSecret::class,
         ]);
+
+        // This is a SPA + JSON API: web guests belong on the SPA login
+        // screen, and API guests get a 401 (see withExceptions below)
+        // instead of a redirect to a non-existent named route.
+        $middleware->redirectGuestsTo('/login');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        // API clients should always receive JSON (e.g. a 401 for guests)
+        // instead of being redirected to a non-existent "login" web route.
+        $exceptions->shouldRenderJsonWhen(
+            fn ($request) => $request->is('api/*') || $request->expectsJson()
+        );
     })->create();
